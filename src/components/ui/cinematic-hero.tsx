@@ -286,11 +286,11 @@ export function CinematicHero({
             
             {/* 2. MIDDLE (Mobile) / CENTER (Desktop): IPHONE MOCKUP */}
             <div className="mockup-scroll-wrapper order-2 lg:order-2 relative w-full h-[260px] lg:h-[600px] flex items-center justify-center z-10 will-change-transform" style={{ perspective: "1000px" }}>
-              <div className="relative w-full h-full flex flex-col lg:flex-row items-center justify-between p-0 md:p-12 lg:p-20 transform scale-[0.5] md:scale-75 lg:scale-100" style={{ transformOrigin: 'center center' }}>
+              <div className="relative w-full h-full flex flex-col lg:flex-row items-center justify-between p-0 md:p-12 lg:p-20 transform scale-[0.5] md:scale-[0.68] lg:scale-100" style={{ transformOrigin: 'center center' }}>
                 {/* The iPhone Bezel */}
                 <div
                   ref={mockupRef}
-                  className="relative w-[280px] h-[580px] rounded-[3rem] iphone-bezel flex flex-col will-change-transform"
+                  className="relative w-[320px] h-[460px] rounded-[3rem] iphone-bezel flex flex-col will-change-transform"
                   style={{ transformStyle: "preserve-3d" }}
                 >
                   <div className="absolute top-[120px] -left-[3px] w-[3px] h-[25px] hardware-btn rounded-l-md z-0" aria-hidden="true" />
@@ -318,9 +318,9 @@ export function CinematicHero({
                       </div>
                       
                       <div className="phone-widget relative w-40 h-40 mx-auto flex items-center justify-center mb-6">
-                        <svg className="absolute inset-0 w-full h-full" aria-hidden="true">
-                          <circle cx="88" cy="88" r="64" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="12" />
-                          <circle className="progress-ring" cx="88" cy="88" r="64" fill="none" stroke="#6EBF8B" strokeWidth="12" />
+                        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 160 160" aria-hidden="true">
+                          <circle cx="80" cy="80" r="60" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="12" />
+                          <circle className="progress-ring" cx="80" cy="80" r="60" fill="none" stroke="#6EBF8B" strokeWidth="12" />
                         </svg>
                         <div className="text-center z-10 flex flex-col items-center">
                           <span className="counter-val text-4xl font-extrabold tracking-tighter text-white">0</span>

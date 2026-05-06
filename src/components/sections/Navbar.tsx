@@ -27,56 +27,72 @@ export function Navbar() {
 
   const navItems = [
     { id: 'home',      icon: <span>Home</span>,     label: 'Home',     onClick: () => handleNavClick('home') },
-    { id: 'portfolio', icon: <span>Work</span>,      label: 'Work',     onClick: () => handleNavClick('portfolio') },
     { id: 'services',  icon: <span>Services</span>,  label: 'Services', onClick: () => handleNavClick('services') },
     { id: 'process',   icon: <span>Process</span>,   label: 'Process',  onClick: () => handleNavClick('process') },
-    { id: 'about',     icon: <span>About</span>,     label: 'About',    onClick: () => handleNavClick('about') },
+    { id: 'portfolio', icon: <span>Work</span>,      label: 'Work',     onClick: () => handleNavClick('portfolio') },
+    { id: 'about',     icon: <span>About us</span>,  label: 'About us', onClick: () => handleNavClick('about') },
     { id: 'contact',   icon: <span>Contact</span>,   label: 'Contact',  onClick: () => handleNavClick('contact') },
   ];
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
 
+    // ── Navbar show/hide on scroll direction ──────────────────────────────
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const scrollingUp = scrollY < lastScrollY;
 
       if (scrollY < 50) {
-        // At the very top — show full navbar
         setNavState('full');
       } else if (scrollingUp) {
-        // Scrolling up — show only the pill
         setNavState('pill');
       } else {
-        // Scrolling down — hide everything
         setNavState('hidden');
         setIsMobileMenuOpen(false);
       }
 
       lastScrollY = scrollY;
-
-      // Active section detection
-      const scrollPosition = scrollY + window.innerHeight / 3;
-      let currentActiveIndex = 0;
-      let maxPassedOffset = -1;
-
-      navItems.forEach((item, index) => {
-        const element = document.getElementById(item.id);
-        if (element) {
-          const { offsetTop } = element;
-          if (scrollPosition >= offsetTop && offsetTop > maxPassedOffset) {
-            maxPassedOffset = offsetTop;
-            currentActiveIndex = index;
-          }
-        }
-      });
-
-      setActiveSection(currentActiveIndex);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    // ── Scroll-spy: explicit ID → navItem index map ───────────────────────
+    // Physical page order doesn't matter — each section ID is mapped
+    // directly to its nav position, so they can never get out of sync.
+    const sectionNavIndex: Record<string, number> = {
+      home: 0, services: 1, process: 2, portfolio: 3, about: 4, contact: 5,
+    };
+    // Physical page order (for iteration)
+    const pageOrder = ['home', 'services', 'process', 'portfolio', 'about', 'contact'];
+
+    const updateActiveSection = () => {
+      const threshold = window.innerHeight * 0.45; // section top must be above 45% of screen
+      let activeSectionId = 'home';
+      let bestTop = -Infinity;
+
+      pageOrder.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const top = el.getBoundingClientRect().top;
+        // Pick the section whose top has scrolled past the threshold but is highest (least negative)
+        if (top <= threshold && top > bestTop) {
+          bestTop = top;
+          activeSectionId = id;
+        }
+      });
+
+      const idx = sectionNavIndex[activeSectionId] ?? 0;
+      setActiveSection(idx);
+    };
+
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
+    updateActiveSection();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', updateActiveSection);
+    };
   }, []);
 
   const isHidden = navState === 'hidden';
