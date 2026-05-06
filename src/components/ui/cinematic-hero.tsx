@@ -88,122 +88,88 @@ export function CinematicHero({
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
     const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
-    
+
     const ctx = gsap.context(() => {
-      // 1. Initial State: Hide elements via JS instead of CSS
-      // This ensures if JS fails to load or execute, content remains visible.
-      gsap.set(".gsap-reveal", { visibility: "visible" }); // Reset the class if it was hidden by CSS (just in case)
-      
+      gsap.set(".gsap-reveal", { visibility: "visible" });
+
+      // ─── MOBILE: Simple 2-step fade, no pin, no card animation ───
       if (isMobile) {
-        gsap.set(".text-track", { autoAlpha: 0, y: 40, scale: 0.9 });
-        gsap.set(".text-days", { autoAlpha: 1, clipPath: "inset(0 100% 0 0)" });
+        // Show hero text immediately
+        gsap.set(".text-track", { autoAlpha: 1, y: 0, scale: 1 });
+        gsap.set(".text-days", { autoAlpha: 1, clipPath: "inset(0 0% 0 0)" });
+        // Fade in taglines
+        gsap.from(".text-track", { duration: 0.8, autoAlpha: 0, y: 30, ease: "power3.out", delay: 0.1 });
+        gsap.from(".text-days", { duration: 0.8, autoAlpha: 0, y: 30, ease: "power3.out", delay: 0.3 });
+        // Show CTA after a short pause
+        gsap.set(".cta-wrapper", { autoAlpha: 1, scale: 1 });
+        gsap.from(".cta-wrapper", { duration: 0.8, autoAlpha: 0, y: 20, ease: "power3.out", delay: 0.8 });
+        // Hide the card entirely on mobile
+        gsap.set(".main-card", { autoAlpha: 0, display: "none" });
+        return; // Skip all desktop scroll logic
+      }
+
+      // ─── DESKTOP / TABLET: Full cinematic experience ───
+      if (isTablet) {
+        gsap.set(".text-track", { autoAlpha: 0, y: 60, scale: 0.85, filter: "blur(8px)", rotationX: -20 });
       } else {
         gsap.set(".text-track", { autoAlpha: 0, y: 60, scale: 0.85, filter: "blur(8px)", rotationX: -20 });
-        gsap.set(".text-days", { autoAlpha: 1, clipPath: "inset(0 100% 0 0)" });
       }
-      
+      gsap.set(".text-days", { autoAlpha: 1, clipPath: "inset(0 100% 0 0)" });
       gsap.set(".main-card", { y: window.innerHeight + 200, autoAlpha: 1 });
       gsap.set([".card-left-text", ".card-right-text", ".mockup-scroll-wrapper", ".floating-badge", ".phone-widget"], { autoAlpha: 0 });
       gsap.set(".cta-wrapper", { autoAlpha: 0, scale: 0.8 });
-      gsap.set(".gsap-reveal", { visibility: "visible" });
-      
-      // Intro animation
-      const introTl = gsap.timeline({ delay: isMobile ? 0.2 : 0.5 });
-      if (isMobile) {
-        introTl
-          .to(".text-track", { duration: 1.0, autoAlpha: 1, y: 0, scale: 1, ease: "expo.out" })
-          .to(".text-days", { duration: 0.9, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=0.6");
-        // Failsafe: if animation glitches, force elements visible after 2s
-        setTimeout(() => {
-          gsap.set([".text-track", ".text-days"], { autoAlpha: 1, y: 0, scale: 1, clipPath: "inset(0 0% 0 0)" });
-        }, 2500);
-      } else {
-        introTl
-          .to(".text-track", { duration: 2.5, autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, ease: "expo.out" })
-          .to(".text-days", { duration: 2.0, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=1.5");
-      }
-        
-      // Scroll timeline — shorter on mobile for faster passage
-      const scrollDistance = isMobile ? 1200 : isTablet ? 1700 : 2000;
-      const scrubAmount = isMobile ? true : 1.5; // true = instant, smoother on mobile
-      
+
+      const introTl = gsap.timeline({ delay: 0.5 });
+      introTl
+        .to(".text-track", { duration: 2.5, autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, ease: "expo.out" })
+        .to(".text-days", { duration: 2.0, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=1.5");
+
+      const scrollDistance = isTablet ? 1700 : 2000;
       const scrollTl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
           end: `+=${scrollDistance}`,
           pin: true,
-          scrub: scrubAmount,
+          scrub: 1.5,
           anticipatePin: 1,
         },
       });
-      
-      // Simplified fade-out on mobile (no filter blur)
-      if (isMobile) {
-        scrollTl
-          .to([".hero-text-wrapper", ".dotted-surface"], { scale: 1.05, opacity: 0, ease: "power2.inOut", duration: 1 }, 0)
-          .to(".main-card", { y: 0, ease: "power3.inOut", duration: 1.5 }, 0)
-          .to(".main-card", { width: "100%", height: "100%", borderRadius: "0px", ease: "power3.inOut", duration: 1 })
-          .fromTo(".mockup-scroll-wrapper",
-            { y: 200, autoAlpha: 0, scale: 0.7 },
-            { y: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1.5 }, "-=0.5"
-          )
-          .fromTo(".phone-widget", { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.08, ease: "back.out(1.2)", duration: 0.8 }, "-=1")
-          .to(".progress-ring", { strokeDashoffset: 60, duration: 1, ease: "power3.inOut" }, "-=0.8")
-          .to(".counter-val", { innerHTML: metricValue, snap: { innerHTML: 1 }, duration: 1, ease: "expo.out" }, "-=1.0")
-          .fromTo(".floating-badge", { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, ease: "back.out(1.5)", duration: 0.8, stagger: 0.08 }, "-=1.0")
-          .fromTo(".card-left-text", { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, ease: "power4.out", duration: 0.8 }, "-=1.0")
-          .fromTo(".card-right-text", { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, ease: "expo.out", duration: 0.8 }, "<")
-          .to({}, { duration: 0.3 })
-          .set(".hero-text-wrapper", { autoAlpha: 0 })
-          .set(".cta-wrapper", { autoAlpha: 1 })
-          .to([".mockup-scroll-wrapper", ".floating-badge", ".card-left-text", ".card-right-text"], {
-            y: -30, autoAlpha: 0, ease: "power3.in", duration: 0.6, stagger: 0.03,
-          })
-          .to(".main-card", {
-            width: "92vw", height: "92vh", borderRadius: "32px",
-            ease: "expo.inOut", duration: 1
-          }, "pullback")
-          .to(".cta-wrapper", { scale: 1, ease: "expo.inOut", duration: 1 }, "pullback")
-          .to(".main-card", { y: -window.innerHeight - 300, ease: "power3.in", duration: 1 });
-      } else {
-        scrollTl
-          .to([".hero-text-wrapper", ".dotted-surface"], { scale: 1.15, filter: "blur(10px)", opacity: 0.2, ease: "power2.inOut", duration: 1 }, 0)
-          .to(".main-card", { y: 0, ease: "power3.inOut", duration: 1.5 }, 0)
-          .to(".main-card", { width: "100%", height: "100%", borderRadius: "0px", ease: "power3.inOut", duration: 1 })
-          .fromTo(".mockup-scroll-wrapper",
-            { y: 300, z: -500, rotationX: 50, rotationY: -30, autoAlpha: 0, scale: 0.6 },
-            { y: 0, z: 0, rotationX: 0, rotationY: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1.5 }, "-=0.5"
-          )
-          .fromTo(".phone-widget", { y: 40, autoAlpha: 0, scale: 0.95 }, { y: 0, autoAlpha: 1, scale: 1, stagger: 0.1, ease: "back.out(1.2)", duration: 1 }, "-=1")
-          .to(".progress-ring", { strokeDashoffset: 60, duration: 1, ease: "power3.inOut" }, "-=0.8")
-          .to(".counter-val", { innerHTML: metricValue, snap: { innerHTML: 1 }, duration: 1, ease: "expo.out" }, "-=1.0")
-          .fromTo(".floating-badge", { y: 100, autoAlpha: 0, scale: 0.7, rotationZ: -10 }, { y: 0, autoAlpha: 1, scale: 1, rotationZ: 0, ease: "back.out(1.5)", duration: 1, stagger: 0.1 }, "-=1.0")
-          .fromTo(".card-left-text", { x: -50, autoAlpha: 0 }, { x: 0, autoAlpha: 1, ease: "power4.out", duration: 1 }, "-=1.0")
-          .fromTo(".card-right-text", { x: 50, autoAlpha: 0, scale: 0.8 }, { x: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1 }, "<")
-          .to({}, { duration: 0.5 })
-          .set(".hero-text-wrapper", { autoAlpha: 0 })
-          .set(".cta-wrapper", { autoAlpha: 1 })
-          .to([".mockup-scroll-wrapper", ".floating-badge", ".card-left-text", ".card-right-text"], {
-            scale: 0.9, y: -40, z: -200, autoAlpha: 0, ease: "power3.in", duration: 0.8, stagger: 0.05,
-          })
-          .to(".main-card", {
-            width: isTablet ? "90vw" : "85vw",
-            height: isTablet ? "90vh" : "85vh",
-            borderRadius: isTablet ? "36px" : "40px",
-            ease: "expo.inOut",
-            duration: 1
-          }, "pullback")
-          .to(".cta-wrapper", { scale: 1, filter: "blur(0px)", ease: "expo.inOut", duration: 1 }, "pullback")
-          .to(".main-card", { y: -window.innerHeight - 300, ease: "power3.in", duration: 1 });
-      }
-        
+
+      scrollTl
+        .to([".hero-text-wrapper", ".dotted-surface"], { scale: 1.15, filter: "blur(10px)", opacity: 0.2, ease: "power2.inOut", duration: 1 }, 0)
+        .to(".main-card", { y: 0, ease: "power3.inOut", duration: 1.5 }, 0)
+        .to(".main-card", { width: "100%", height: "100%", borderRadius: "0px", ease: "power3.inOut", duration: 1 })
+        .fromTo(".mockup-scroll-wrapper",
+          { y: 300, z: -500, rotationX: 50, rotationY: -30, autoAlpha: 0, scale: 0.6 },
+          { y: 0, z: 0, rotationX: 0, rotationY: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1.5 }, "-=0.5"
+        )
+        .fromTo(".phone-widget", { y: 40, autoAlpha: 0, scale: 0.95 }, { y: 0, autoAlpha: 1, scale: 1, stagger: 0.1, ease: "back.out(1.2)", duration: 1 }, "-=1")
+        .to(".progress-ring", { strokeDashoffset: 60, duration: 1, ease: "power3.inOut" }, "-=0.8")
+        .to(".counter-val", { innerHTML: metricValue, snap: { innerHTML: 1 }, duration: 1, ease: "expo.out" }, "-=1.0")
+        .fromTo(".floating-badge", { y: 100, autoAlpha: 0, scale: 0.7, rotationZ: -10 }, { y: 0, autoAlpha: 1, scale: 1, rotationZ: 0, ease: "back.out(1.5)", duration: 1, stagger: 0.1 }, "-=1.0")
+        .fromTo(".card-left-text", { x: -50, autoAlpha: 0 }, { x: 0, autoAlpha: 1, ease: "power4.out", duration: 1 }, "-=1.0")
+        .fromTo(".card-right-text", { x: 50, autoAlpha: 0, scale: 0.8 }, { x: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1 }, "<")
+        .to({}, { duration: 0.5 })
+        .set(".hero-text-wrapper", { autoAlpha: 0 })
+        .set(".cta-wrapper", { autoAlpha: 1 })
+        .to([".mockup-scroll-wrapper", ".floating-badge", ".card-left-text", ".card-right-text"], {
+          scale: 0.9, y: -40, z: -200, autoAlpha: 0, ease: "power3.in", duration: 0.8, stagger: 0.05,
+        })
+        .to(".main-card", {
+          width: isTablet ? "90vw" : "85vw",
+          height: isTablet ? "90vh" : "85vh",
+          borderRadius: isTablet ? "36px" : "40px",
+          ease: "expo.inOut",
+          duration: 1
+        }, "pullback")
+        .to(".cta-wrapper", { scale: 1, filter: "blur(0px)", ease: "expo.inOut", duration: 1 }, "pullback")
+        .to(".main-card", { y: -window.innerHeight - 300, ease: "power3.in", duration: 1 });
+
     }, containerRef);
-    
-    // Force refresh ScrollTrigger after a short delay to ensure correct height on mobile
-    const timeout = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 1000);
+
+    // Refresh ScrollTrigger after layout stabilises (desktop/tablet only)
+    const timeout = setTimeout(() => { ScrollTrigger.refresh(); }, 600);
 
     return () => {
       ctx.revert();
@@ -261,8 +227,8 @@ export function CinematicHero({
         </div>
       </div>
       
-      {/* FOREGROUND LAYER: The Physical Deep Blue Card */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none" style={{ perspective: "1500px" }}>
+      {/* FOREGROUND LAYER: The Physical Deep Blue Card — desktop/tablet only */}
+      <div className="absolute inset-0 z-20 hidden md:flex items-center justify-center pointer-events-none" style={{ perspective: "1500px" }}>
         <div
           ref={mainCardRef}
           className="main-card premium-depth-card relative overflow-hidden gsap-reveal flex items-center justify-center pointer-events-auto w-[92vw] md:w-[85vw] h-[85vh] md:h-[85vh] rounded-[32px] md:rounded-[40px] will-change-transform"
