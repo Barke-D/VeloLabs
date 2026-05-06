@@ -108,11 +108,15 @@ export function CinematicHero({
       gsap.set(".gsap-reveal", { visibility: "visible" });
       
       // Intro animation
-      const introTl = gsap.timeline({ delay: 0.5 });
+      const introTl = gsap.timeline({ delay: isMobile ? 0.2 : 0.5 });
       if (isMobile) {
         introTl
-          .to(".text-track", { duration: 1.8, autoAlpha: 1, y: 0, scale: 1, ease: "expo.out" })
-          .to(".text-days", { duration: 1.5, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=1.2");
+          .to(".text-track", { duration: 1.0, autoAlpha: 1, y: 0, scale: 1, ease: "expo.out" })
+          .to(".text-days", { duration: 0.9, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=0.6");
+        // Failsafe: if animation glitches, force elements visible after 2s
+        setTimeout(() => {
+          gsap.set([".text-track", ".text-days"], { autoAlpha: 1, y: 0, scale: 1, clipPath: "inset(0 0% 0 0)" });
+        }, 2500);
       } else {
         introTl
           .to(".text-track", { duration: 2.5, autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, ease: "expo.out" })
@@ -268,14 +272,14 @@ export function CinematicHero({
           <div className="relative w-full h-full max-w-7xl mx-auto px-4 lg:px-12 flex flex-col justify-evenly lg:grid lg:grid-cols-3 items-center lg:gap-8 z-10 py-6 lg:py-0">
             {/* 1. TOP (Mobile) / RIGHT (Desktop): BRAND NAME */}
             <div className="card-right-text gsap-reveal order-1 lg:order-3 flex justify-center lg:justify-end z-20 w-full">
-              <h2 className="text-6xl md:text-[6rem] lg:text-[8rem] font-black uppercase tracking-tighter text-card-silver-matte lg:mt-0">
+              <h2 className="hidden lg:block text-6xl md:text-[6rem] lg:text-[8rem] font-black uppercase tracking-tighter text-card-silver-matte lg:mt-0">
                 {brandName}
               </h2>
             </div>
             
             {/* 2. MIDDLE (Mobile) / CENTER (Desktop): IPHONE MOCKUP */}
-            <div className="mockup-scroll-wrapper order-2 lg:order-2 relative w-full h-[380px] lg:h-[600px] flex items-center justify-center z-10 will-change-transform" style={{ perspective: "1000px" }}>
-              <div className="relative w-full h-full flex flex-col lg:flex-row items-center justify-between p-4 md:p-12 lg:p-20 transform scale-[0.65] md:scale-85 lg:scale-100">
+            <div className="mockup-scroll-wrapper order-2 lg:order-2 relative w-full h-[260px] lg:h-[600px] flex items-center justify-center z-10 will-change-transform" style={{ perspective: "1000px" }}>
+              <div className="relative w-full h-full flex flex-col lg:flex-row items-center justify-between p-0 md:p-12 lg:p-20 transform scale-[0.5] md:scale-75 lg:scale-100" style={{ transformOrigin: 'center center' }}>
                 {/* The iPhone Bezel */}
                 <div
                   ref={mockupRef}
@@ -346,32 +350,32 @@ export function CinematicHero({
                   </div>
                 </div>
                 
-                {/* Floating Glass Badges */}
-                <div className="floating-badge absolute flex top-6 lg:top-12 left-[-15px] lg:left-[-80px] floating-ui-badge rounded-xl lg:rounded-2xl p-3 lg:p-4 items-center gap-3 lg:gap-4 z-30">
-                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-b from-sage-500/20 to-sage-900/10 flex items-center justify-center border border-sage-400/30 shadow-inner">
-                    <span className="text-base lg:text-xl drop-shadow-lg" aria-hidden="true">🎯</span>
+                {/* Floating Glass Badges — desktop only (they clip on mobile) */}
+                <div className="floating-badge hidden lg:flex absolute top-12 left-[-80px] floating-ui-badge rounded-2xl p-4 items-center gap-4 z-30">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-sage-500/20 to-sage-900/10 flex items-center justify-center border border-sage-400/30 shadow-inner">
+                    <span className="text-xl drop-shadow-lg" aria-hidden="true">🎯</span>
                   </div>
                   <div>
-                    <p className="text-white text-xs lg:text-sm font-bold tracking-tight">Strategy</p>
-                    <p className="text-sage-200/50 text-[10px] lg:text-xs font-medium">Digital Planning</p>
+                    <p className="text-white text-sm font-bold tracking-tight">Strategy</p>
+                    <p className="text-sage-200/50 text-xs font-medium">Digital Planning</p>
                   </div>
                 </div>
                 
-                <div className="floating-badge absolute flex bottom-12 lg:bottom-20 right-[-15px] lg:right-[-80px] floating-ui-badge rounded-xl lg:rounded-2xl p-3 lg:p-4 items-center gap-3 lg:gap-4 z-30">
-                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-b from-indigo-500/20 to-indigo-900/10 flex items-center justify-center border border-indigo-400/30 shadow-inner">
-                    <span className="text-base lg:text-lg drop-shadow-lg" aria-hidden="true">✨</span>
+                <div className="floating-badge hidden lg:flex absolute bottom-20 right-[-80px] floating-ui-badge rounded-2xl p-4 items-center gap-4 z-30">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-indigo-500/20 to-indigo-900/10 flex items-center justify-center border border-indigo-400/30 shadow-inner">
+                    <span className="text-lg drop-shadow-lg" aria-hidden="true">✨</span>
                   </div>
                   <div>
-                    <p className="text-white text-xs lg:text-sm font-bold tracking-tight">Design</p>
-                    <p className="text-blue-200/50 text-[10px] lg:text-xs font-medium">Pixel Perfect</p>
+                    <p className="text-white text-sm font-bold tracking-tight">Design</p>
+                    <p className="text-blue-200/50 text-xs font-medium">Pixel Perfect</p>
                   </div>
                 </div>
               </div>
             </div>
             
             {/* 3. BOTTOM (Mobile) / LEFT (Desktop): ACCOUNTABILITY TEXT */}
-            <div className="card-left-text gsap-reveal order-3 lg:order-1 flex flex-col justify-center text-center lg:text-left z-20 w-full lg:max-w-none px-4 lg:px-0 pb-4 md:pb-0">
-              <h3 className="text-white text-2xl md:text-3xl lg:text-4xl font-bold mb-0 lg:mb-5 tracking-tight">
+            <div className="card-left-text gsap-reveal order-3 lg:order-1 flex flex-col justify-center text-center lg:text-left z-20 w-full lg:max-w-none px-4 lg:px-0">
+              <h3 className="text-white text-xl md:text-3xl lg:text-4xl font-bold mb-0 lg:mb-5 tracking-tight leading-tight">
                 {cardHeading}
               </h3>
               <p className="hidden md:block text-slate-300 text-sm md:text-base lg:text-lg font-normal leading-relaxed mx-auto lg:mx-0 max-w-sm lg:max-w-none">
