@@ -11,7 +11,7 @@ if (typeof window !== "undefined") {
 }
 
 const INJECTED_STYLES = `
-.gsap-reveal { visibility: hidden; }
+/* Initial state handled by JS to prevent invisible content if JS fails */
 `;
 
 export interface CinematicHeroProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -90,7 +90,10 @@ export function CinematicHero({
     const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
     
     const ctx = gsap.context(() => {
-      // Use simpler transforms on mobile (no filter blur — causes repaints)
+      // 1. Initial State: Hide elements via JS instead of CSS
+      // This ensures if JS fails to load or execute, content remains visible.
+      gsap.set(".gsap-reveal", { visibility: "visible" }); // Reset the class if it was hidden by CSS (just in case)
+      
       if (isMobile) {
         gsap.set(".text-track", { autoAlpha: 0, y: 40, scale: 0.9 });
         gsap.set(".text-days", { autoAlpha: 1, clipPath: "inset(0 100% 0 0)" });
@@ -102,6 +105,7 @@ export function CinematicHero({
       gsap.set(".main-card", { y: window.innerHeight + 200, autoAlpha: 1 });
       gsap.set([".card-left-text", ".card-right-text", ".mockup-scroll-wrapper", ".floating-badge", ".phone-widget"], { autoAlpha: 0 });
       gsap.set(".cta-wrapper", { autoAlpha: 0, scale: 0.8 });
+      gsap.set(".gsap-reveal", { visibility: "visible" });
       
       // Intro animation
       const introTl = gsap.timeline({ delay: 0.5 });
@@ -116,8 +120,8 @@ export function CinematicHero({
       }
         
       // Scroll timeline — shorter on mobile for faster passage
-      const scrollDistance = isMobile ? 1400 : isTablet ? 1700 : 2000;
-      const scrubAmount = isMobile ? 0.8 : 1.5;
+      const scrollDistance = isMobile ? 1200 : isTablet ? 1700 : 2000;
+      const scrubAmount = isMobile ? true : 1.5; // true = instant, smoother on mobile
       
       const scrollTl = gsap.timeline({
         scrollTrigger: {
@@ -192,18 +196,26 @@ export function CinematicHero({
         
     }, containerRef);
     
-    return () => ctx.revert();
+    // Force refresh ScrollTrigger after a short delay to ensure correct height on mobile
+    const timeout = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 1000);
+
+    return () => {
+      ctx.revert();
+      clearTimeout(timeout);
+    };
   }, [metricValue]);
 
   return (
     <div
       ref={containerRef}
-      className={cn("relative w-screen h-screen overflow-hidden flex items-center justify-center text-foreground font-sans antialiased", className)}
-      style={{ perspective: "1500px" }}
+      className={cn("relative w-full h-screen flex items-center justify-center text-foreground font-sans antialiased touch-pan-y", className)}
+      style={{ perspective: "1500px", overflow: "clip" }}
       {...props}
     >
       <style dangerouslySetInnerHTML={{ __html: INJECTED_STYLES }} />
-      <Waves className="dotted-surface absolute inset-0 z-0 h-full w-full opacity-60" strokeColor="rgba(255, 255, 255, 0.3)" />
+      <Waves className="dotted-surface absolute inset-0 z-0 h-full w-full opacity-60 pointer-events-none" strokeColor="rgba(255, 255, 255, 0.3)" />
       <div className="film-grain" aria-hidden="true" />
       
       {/* BACKGROUND LAYER: Hero Texts */}
@@ -249,7 +261,7 @@ export function CinematicHero({
       <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none" style={{ perspective: "1500px" }}>
         <div
           ref={mainCardRef}
-          className="main-card premium-depth-card relative overflow-hidden gsap-reveal flex items-center justify-center pointer-events-auto w-[92vw] md:w-[85vw] h-[92vh] md:h-[85vh] rounded-[32px] md:rounded-[40px] will-change-transform"
+          className="main-card premium-depth-card relative overflow-hidden gsap-reveal flex items-center justify-center pointer-events-auto w-[92vw] md:w-[85vw] h-[85vh] md:h-[85vh] rounded-[32px] md:rounded-[40px] will-change-transform"
         >
           <div className="card-sheen" aria-hidden="true" />
           
@@ -263,7 +275,7 @@ export function CinematicHero({
             
             {/* 2. MIDDLE (Mobile) / CENTER (Desktop): IPHONE MOCKUP */}
             <div className="mockup-scroll-wrapper order-2 lg:order-2 relative w-full h-[380px] lg:h-[600px] flex items-center justify-center z-10 will-change-transform" style={{ perspective: "1000px" }}>
-              <div className="relative w-full h-full flex items-center justify-center transform scale-[0.65] md:scale-85 lg:scale-100">
+              <div className="relative w-full h-full flex flex-col lg:flex-row items-center justify-between p-4 md:p-12 lg:p-20 transform scale-[0.65] md:scale-85 lg:scale-100">
                 {/* The iPhone Bezel */}
                 <div
                   ref={mockupRef}
@@ -294,7 +306,7 @@ export function CinematicHero({
                         <div className="w-9 h-9 rounded-full bg-white/5 text-neutral-200 flex items-center justify-center font-bold text-sm border border-white/10 shadow-lg shadow-black/50">★</div>
                       </div>
                       
-                      <div className="phone-widget relative w-44 h-44 mx-auto flex items-center justify-center mb-8 drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]">
+                      <div className="phone-widget relative w-40 h-40 mx-auto flex items-center justify-center mb-6">
                         <svg className="absolute inset-0 w-full h-full" aria-hidden="true">
                           <circle cx="88" cy="88" r="64" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="12" />
                           <circle className="progress-ring" cx="88" cy="88" r="64" fill="none" stroke="#6EBF8B" strokeWidth="12" />
@@ -358,7 +370,7 @@ export function CinematicHero({
             </div>
             
             {/* 3. BOTTOM (Mobile) / LEFT (Desktop): ACCOUNTABILITY TEXT */}
-            <div className="card-left-text gsap-reveal order-3 lg:order-1 flex flex-col justify-center text-center lg:text-left z-20 w-full lg:max-w-none px-4 lg:px-0">
+            <div className="card-left-text gsap-reveal order-3 lg:order-1 flex flex-col justify-center text-center lg:text-left z-20 w-full lg:max-w-none px-4 lg:px-0 pb-4 md:pb-0">
               <h3 className="text-white text-2xl md:text-3xl lg:text-4xl font-bold mb-0 lg:mb-5 tracking-tight">
                 {cardHeading}
               </h3>
