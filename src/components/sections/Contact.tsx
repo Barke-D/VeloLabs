@@ -17,6 +17,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { SuccessModal } from '../ui/success-modal';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -30,6 +31,7 @@ export function Contact() {
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -49,6 +51,7 @@ export function Contact() {
       if (error) throw error;
 
       setStatus('success');
+      setIsModalOpen(true);
       setFormData({
         name: '',
         email: '',
@@ -57,9 +60,6 @@ export function Contact() {
         project_type: '',
         message: ''
       });
-
-      // Reset success message after 5 seconds
-      setTimeout(() => setStatus('idle'), 5000);
     } catch (err: any) {
       console.error('Submission error:', err);
       setStatus('error');
@@ -69,6 +69,14 @@ export function Contact() {
 
   return (
     <section id="contact" className="py-32 bg-[#050806] relative overflow-hidden">
+      <SuccessModal 
+        isOpen={isModalOpen} 
+        onClose={() => {
+          setIsModalOpen(false);
+          setStatus('idle');
+        }} 
+      />
+      
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-900/5 blur-[120px] rounded-full pointer-events-none" />
@@ -200,17 +208,6 @@ export function Contact() {
                 </button>
 
                 {/* Status Messages */}
-                {status === 'success' && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-3 text-primary bg-primary/10 p-4 rounded-2xl"
-                  >
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>Message sent successfully! We'll be in touch soon.</span>
-                  </motion.div>
-                )}
-
                 {status === 'error' && (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
