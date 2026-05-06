@@ -188,8 +188,49 @@ export function CinematicHero({
       <Waves className="dotted-surface absolute inset-0 z-0 h-full w-full opacity-60 pointer-events-none" strokeColor="rgba(255, 255, 255, 0.3)" />
       <div className="film-grain" aria-hidden="true" />
       
+      {/* MOBILE LAYOUT: stacked column — hidden on md+ where absolute layers take over */}
+      <div className="md:hidden absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-6 gap-8 pointer-events-auto">
+        {/* Hero taglines */}
+        <div className="hero-text-wrapper flex flex-col items-center gap-1 will-change-transform">
+          <h1 className="text-track gsap-reveal text-3d-matte text-[2.6rem] font-bold tracking-tight leading-tight">
+            {tagline1}
+          </h1>
+          <h1 className="text-days gsap-reveal text-silver-matte text-[2.6rem] font-extrabold tracking-tighter leading-tight">
+            {tagline2}
+          </h1>
+        </div>
+
+        {/* CTA */}
+        <div className="cta-wrapper flex flex-col items-center gap-4 will-change-transform">
+          <h2 className="text-2xl font-bold tracking-tight text-silver-matte">
+            {ctaHeading}
+          </h2>
+          <p className="text-muted-foreground text-sm max-w-xs font-light leading-relaxed">
+            {ctaDescription}
+          </p>
+          <a
+            href="/#contact"
+            onClick={(e) => {
+              const element = document.getElementById('contact');
+              if (element) {
+                e.preventDefault();
+                element.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            aria-label="Let's build something"
+            className="btn-modern-light flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <div className="text-left">
+              <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase mb-[-2px]">Start your project</div>
+              <div className="text-xl font-bold leading-none tracking-tight">Contact Us</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      {/* DESKTOP LAYERS: hero text + CTA as absolute overlays — hidden on mobile */}
       {/* BACKGROUND LAYER: Hero Texts */}
-      <div className="hero-text-wrapper absolute z-10 flex flex-col items-center justify-center text-center w-screen px-4 will-change-transform">
+      <div className="hero-text-wrapper hidden md:flex absolute z-10 flex-col items-center justify-center text-center w-screen px-4 will-change-transform">
         <h1 className="text-track gsap-reveal text-3d-matte text-5xl md:text-7xl lg:text-[6rem] font-bold tracking-tight mb-2">
           {tagline1}
         </h1>
@@ -199,7 +240,7 @@ export function CinematicHero({
       </div>
       
       {/* BACKGROUND LAYER 2: Tactile CTA Buttons */}
-      <div className="cta-wrapper absolute z-10 flex flex-col items-center justify-center text-center w-screen px-4 gsap-reveal pointer-events-auto will-change-transform">
+      <div className="cta-wrapper hidden md:flex absolute z-10 flex-col items-center justify-center text-center w-screen px-4 gsap-reveal pointer-events-auto will-change-transform">
         <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight text-silver-matte">
           {ctaHeading}
         </h2>
