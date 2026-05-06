@@ -29,10 +29,10 @@ export interface CinematicHeroProps extends React.HTMLAttributes<HTMLDivElement>
 
 export function CinematicHero({
   brandName = "VeloLabs",
-  tagline1 = "We design and sell",
-  tagline2 = "websites.",
-  cardHeading = "Web & digital product studio.",
-  cardDescription = <><span className="text-white font-semibold">VeloLabs</span> empowers businesses with stunning digital products, beautiful designs, and functional platforms that users love.</>,
+  tagline1 = "Your next website",
+  tagline2 = "done right.",
+  cardHeading = "Everything your business needs online.",
+  cardDescription = <><span className="text-white font-semibold">VeloLabs</span> handles design, development, and strategy so you can focus on what you do best.</>,
   metricValue = 15,
   metricLabel = "Projects",
   ctaHeading = "Start a Project.",
