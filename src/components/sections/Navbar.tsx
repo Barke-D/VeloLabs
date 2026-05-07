@@ -26,12 +26,12 @@ export function Navbar() {
   };
 
   const navItems = [
-    { id: 'home',      icon: <span>Home</span>,     label: 'Home',     onClick: () => handleNavClick('home') },
-    { id: 'services',  icon: <span>Services</span>,  label: 'Services', onClick: () => handleNavClick('services') },
-    { id: 'process',   icon: <span>Process</span>,   label: 'Process',  onClick: () => handleNavClick('process') },
-    { id: 'portfolio', icon: <span>Work</span>,      label: 'Work',     onClick: () => handleNavClick('portfolio') },
-    { id: 'about',     icon: <span>About us</span>,  label: 'About us', onClick: () => handleNavClick('about') },
-    { id: 'contact',   icon: <span>Contact</span>,   label: 'Contact',  onClick: () => handleNavClick('contact') },
+    { id: 'home', icon: <span>Home</span>, label: 'Home', onClick: () => handleNavClick('home') },
+    { id: 'services', icon: <span>Services</span>, label: 'Services', onClick: () => handleNavClick('services') },
+    { id: 'process', icon: <span>Process</span>, label: 'Process', onClick: () => handleNavClick('process') },
+    { id: 'portfolio', icon: <span>Work</span>, label: 'Work', onClick: () => handleNavClick('portfolio') },
+    { id: 'about', icon: <span>About us</span>, label: 'About us', onClick: () => handleNavClick('about') },
+    { id: 'contact', icon: <span>Contact</span>, label: 'Contact', onClick: () => handleNavClick('contact') },
   ];
 
   useEffect(() => {
@@ -204,9 +204,8 @@ export function Navbar() {
 
       {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-background/95 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-300 md:hidden ${
-          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
+        className={`fixed inset-0 z-40 bg-background/95 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
       >
         <nav className="flex flex-col items-center gap-8 text-2xl font-bold">
           {navItems.map((item) => (
