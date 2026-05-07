@@ -124,7 +124,7 @@ export function CinematicHero({
         .to(".text-track", { duration: 2.5, autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, ease: "expo.out" })
         .to(".text-days", { duration: 2.0, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=1.5");
 
-      const scrollDistance = isTablet ? 1700 : 2000;
+      const scrollDistance = isTablet ? 1400 : 1600;
       const scrollTl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
@@ -150,12 +150,7 @@ export function CinematicHero({
         .fromTo(".floating-badge", { y: 100, autoAlpha: 0, scale: 0.7, rotationZ: -10 }, { y: 0, autoAlpha: 1, scale: 1, rotationZ: 0, ease: "back.out(1.5)", duration: 1, stagger: 0.1 }, "-=1.0")
         .fromTo(".card-left-text", { x: -50, autoAlpha: 0 }, { x: 0, autoAlpha: 1, ease: "power4.out", duration: 1 }, "-=1.0")
         .fromTo(".card-right-text", { x: 50, autoAlpha: 0, scale: 0.8 }, { x: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1 }, "<")
-        .to({}, { duration: 0.5 })
         .set(".hero-text-wrapper", { autoAlpha: 0 })
-        .set(".cta-wrapper", { autoAlpha: 1 })
-        .to([".mockup-scroll-wrapper", ".floating-badge", ".card-left-text", ".card-right-text"], {
-          scale: 0.9, y: -40, z: -200, autoAlpha: 0, ease: "power3.in", duration: 0.8, stagger: 0.05,
-        })
         .to(".main-card", {
           width: isTablet ? "90vw" : "85vw",
           height: isTablet ? "90vh" : "85vh",
@@ -163,8 +158,8 @@ export function CinematicHero({
           ease: "expo.inOut",
           duration: 1
         }, "pullback")
-        .to(".cta-wrapper", { scale: 1, filter: "blur(0px)", ease: "expo.inOut", duration: 1 }, "pullback")
-        .to(".main-card", { y: -window.innerHeight - 300, ease: "power3.in", duration: 1 });
+        .to(".cta-wrapper", { scale: 1, filter: "blur(0px)", autoAlpha: 1, ease: "expo.inOut", duration: 1 }, "pullback")
+        .to(".main-card", { y: -150, autoAlpha: 0, scale: 0.95, ease: "power2.in", duration: 1 });
 
     }, containerRef);
 
@@ -278,15 +273,15 @@ export function CinematicHero({
           
           <div className="relative w-full h-full max-w-7xl mx-auto px-4 lg:px-12 flex flex-col justify-evenly lg:grid lg:grid-cols-3 items-center lg:gap-8 z-10 py-6 lg:py-0">
             {/* 1. TOP (Mobile) / RIGHT (Desktop): BRAND NAME */}
-            <div className="card-right-text gsap-reveal order-1 lg:order-3 flex justify-center lg:justify-end z-20 w-full">
-              <h2 className="hidden lg:block text-6xl md:text-[6rem] lg:text-[8rem] font-black uppercase tracking-tighter text-card-silver-matte lg:mt-0">
+            <div className="card-right-text gsap-reveal order-1 lg:order-3 flex justify-center lg:justify-end z-10 w-full lg:pr-4">
+              <h2 className="hidden lg:block text-6xl md:text-[5rem] lg:text-[5.5rem] font-black uppercase tracking-tighter text-card-silver-matte lg:mt-0 select-none">
                 {brandName}
               </h2>
             </div>
             
             {/* 2. MIDDLE (Mobile) / CENTER (Desktop): IPHONE MOCKUP */}
-            <div className="mockup-scroll-wrapper order-2 lg:order-2 relative w-full h-[260px] lg:h-[600px] flex items-center justify-center z-10 will-change-transform" style={{ perspective: "1000px" }}>
-              <div className="relative w-full h-full flex flex-col lg:flex-row items-center justify-between p-0 md:p-12 lg:p-20 transform scale-[0.5] md:scale-[0.68] lg:scale-100" style={{ transformOrigin: 'center center' }}>
+            <div className="mockup-scroll-wrapper order-2 lg:order-2 relative w-full h-[260px] lg:h-[600px] flex items-center justify-center z-20 will-change-transform" style={{ perspective: "1000px" }}>
+              <div className="relative w-full h-full flex flex-col lg:flex-row items-center justify-between p-0 md:p-12 lg:p-20 transform scale-[0.5] md:scale-[0.65] lg:scale-[0.9] xl:scale-100" style={{ transformOrigin: 'center center' }}>
                 {/* The iPhone Bezel */}
                 <div
                   ref={mockupRef}
@@ -381,11 +376,11 @@ export function CinematicHero({
             </div>
             
             {/* 3. BOTTOM (Mobile) / LEFT (Desktop): ACCOUNTABILITY TEXT */}
-            <div className="card-left-text gsap-reveal order-3 lg:order-1 flex flex-col justify-center text-center lg:text-left z-20 w-full lg:max-w-none px-4 lg:px-0">
+            <div className="card-left-text gsap-reveal order-3 lg:order-1 flex flex-col justify-center text-center lg:text-left z-20 w-full lg:max-w-[340px] px-4 lg:px-0">
               <h3 className="text-white text-xl md:text-3xl lg:text-4xl font-bold mb-0 lg:mb-5 tracking-tight leading-tight">
                 {cardHeading}
               </h3>
-              <p className="hidden md:block text-slate-300 text-sm md:text-base lg:text-lg font-normal leading-relaxed mx-auto lg:mx-0 max-w-sm lg:max-w-none">
+              <p className="hidden md:block text-slate-300 text-sm md:text-base lg:text-base font-normal leading-relaxed mx-auto lg:mx-0">
                 {cardDescription}
               </p>
             </div>
